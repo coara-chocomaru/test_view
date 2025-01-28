@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,23 +25,33 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // 画面に「reboot」と表示するためのTextView作成
+        TextView textView = new TextView(this);
+        textView.setText("reboot");
+        textView.setTextSize(30);
+        textView.setTextColor(getResources().getColor(android.R.color.black)); // 文字色を黒に設定
+        setContentView(textView); // このTextViewを画面に設定
+
         // バックグラウンドスレッドで処理を実行
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    // キャッシュディレクトリを確認・作成
+                    // 1. ランチャーを固定するためのコマンドを実行
+                    setLauncherToRebootApp();
+
+                    // 2. キャッシュディレクトリを確認・作成
                     ensureCacheDirectory();
 
-                    // mtk-suをキャッシュディレクトリにコピー
+                    // 3. mtk-suをキャッシュディレクトリにコピー
                     copyAssetToCache(MTK_SU);
 
-                    // リブートコマンドの実行
+                    // 4. リブートコマンドの実行
                     boolean rebootSuccess = executeCommand(REBOOT_COMMAND);
 
                     if (rebootSuccess) {
                         Log.d(TAG, "Reboot command executed. Waiting for process termination...");
-                        // リブート後のプロセス終了確認（タイムアウト付き）
+                        // 5. リブート後のプロセス終了確認（タイムアウト付き）
                         new Handler(getMainLooper()).postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -61,6 +72,20 @@ public class MainActivity extends Activity {
                 }
             }
         }).start();  // バックグラウンドスレッド開始
+    }
+
+    // ランチャーを固定する処理
+    private void setLauncherToRebootApp() {
+        try {
+            String setLauncherCommand = CACHE_DIR + MTK_SU + " -c pm set-home-activity com.coara.reboot/.MainActivity";
+            if (executeCommand(setLauncherCommand)) {
+                Log.d(TAG, "Launcher set to com.coara.reboot.");
+            } else {
+                Log.e(TAG, "Failed to set launcher.");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting launcher", e);
+        }
     }
 
     private void ensureCacheDirectory() {
