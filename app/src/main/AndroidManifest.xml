@@ -1,29 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    
-    <!-- 必要な権限を宣言 -->
-    <!-- 不要な権限（REBOOT, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE）は削除 -->
 
+    <!-- 必要な権限を宣言 -->
+    <uses-permission android:name="android.permission.REBOOT" />
+    
     <application
         android:allowBackup="false"
         android:label="Reboot App"
         android:theme="@android:style/Theme.NoDisplay">
 
-        <!-- ランチャーアプリとして設定 -->
+        <!-- MainActivityを設定 -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
-                <!-- アプリ起動時にこのアクティビティを実行 -->
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-            <!-- インストール後に直接アプリを起動するための設定 -->
-            <meta-data
-                android:name="com.android.launcher.permission.INSTALL_SHORTCUT"
-                android:value="true" />
         </activity>
     </application>
 </manifest>
