@@ -2,9 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     
     <!-- 必要な権限を宣言 -->
-    <uses-permission android:name="android.permission.REBOOT" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- 不要な権限（REBOOT, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE）は削除 -->
 
     <application
         android:allowBackup="false"
