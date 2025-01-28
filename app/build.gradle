@@ -1,0 +1,60 @@
+plugins { 
+    id 'com.android.application'
+}
+
+android {
+    compileSdk = 35
+    namespace = 'com.coara.reboot'
+
+    defaultConfig {
+        minSdk = 21
+        targetSdk = 24
+        versionCode = 1
+        versionName = "1.0"
+        multiDexEnabled = true
+        proguardFiles += 'proguard-rules.pro'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('test.jks')
+            storePassword 'test1234'
+            keyAlias 'key0'
+            keyPassword 'test1234'
+        }
+    }
+
+    buildTypes {
+        configureEach {
+            String variant = new File("release.jks").exists() ? "release" : "debug"
+            signingConfig = signingConfigs[variant]
+        }
+        release {
+            minifyEnabled = true
+            shrinkResources = true
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+    }
+
+    lintOptions {
+        disable 'ExpiredTargetSdkVersion', 'NewApi', 'Range', 'SetTextI18n', 'ScopedStorage', 'FieldCanBeLocal', 'GradleDependency'
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
+}
+
+dependencies {
+    implementation 'androidx.core:core:1.0.0'
+}
