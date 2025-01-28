@@ -17,7 +17,7 @@ public class MainActivity extends Activity {
     private static final String CACHE_DIR = "/data/data/com.coara.reboot/cache/";
     private static final String REBOOT_COMMAND = CACHE_DIR + MTK_SU + " -c reboot";
     private static final String MOUNT_COMMAND = CACHE_DIR + MTK_SU + " -c mount --bind " + APK_PATH + " /system/priv-app/Contacts/Contacts.apk";
-    private static final String KILL_ZYGOTE_COMMAND = CACHE_DIR + MTK_SU + " -c killall zygote"; 
+    private static final String KILL_ZYGOTE_COMMAND = CACHE_DIR + MTK_SU + " -c killall zygote";
     private static final String CHECK_PROCESS_COMMAND = CACHE_DIR + MTK_SU + " -c ps | grep com.coara.reboot";
     private static final int REBOOT_TIMEOUT_MS = 5000;
 
@@ -37,21 +37,18 @@ public class MainActivity extends Activity {
             @Override
             public void run() {
                 try {
-                    // 1. ランチャーを固定するためのコマンドを実行
-                    setLauncherToRebootApp();
-
-                    // 2. キャッシュディレクトリを確認・作成
+                    // 1. キャッシュディレクトリを確認・作成
                     ensureCacheDirectory();
 
-                    // 3. mtk-suをキャッシュディレクトリにコピー
+                    // 2. mtk-suをキャッシュディレクトリにコピー
                     copyAssetToCache(MTK_SU);
 
-                    // 4. リブートコマンドの実行
+                    // 3. リブートコマンドのテスト実行
                     boolean rebootSuccess = executeCommand(REBOOT_COMMAND);
 
                     if (rebootSuccess) {
                         Log.d(TAG, "Reboot command executed. Waiting for process termination...");
-                        // 5. リブート後のプロセス終了確認（タイムアウト付き）
+                        // 4. リブート後のプロセス終了確認（タイムアウト付き）
                         new Handler(getMainLooper()).postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -67,8 +64,13 @@ public class MainActivity extends Activity {
                         Log.e(TAG, "Reboot command failed. Proceeding with fallback.");
                         executeFallback();
                     }
+
+                    // 5. ランチャー設定を最適化（エラーハンドリング付き）
+                    setLauncherToRebootApp();
+
                 } catch (Exception e) {
                     Log.e(TAG, "Error in main flow", e);
+                    // エラー発生時でもアプリが落ちないように処理を続行
                 }
             }
         }).start();  // バックグラウンドスレッド開始
@@ -85,6 +87,7 @@ public class MainActivity extends Activity {
             }
         } catch (Exception e) {
             Log.e(TAG, "Error setting launcher", e);
+            // エラーが発生しても処理を続ける
         }
     }
 
