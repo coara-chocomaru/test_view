@@ -9,7 +9,7 @@
     public static *** e(...);
 }
 
--keep class com.coara.reboot.MainActivity { *; }
+-keep class com.coara.apkload.MainActivity { *; }
 
 -adaptresourcefilecontents **.xml
 -adaptresourcefilenames **.png
