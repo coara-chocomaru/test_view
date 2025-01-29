@@ -21,13 +21,13 @@ public class ProxyActivity extends Activity {
         super.onCreate(savedInstanceState);
         String apkPath = getIntent().getStringExtra("apkPath");
         if (apkPath != null) {
-            loadExternalApk(apkPath);
+            loadExternalApk(apkPath, savedInstanceState);
         } else {
             Log.e(TAG, "APK path is null");
         }
     }
 
-    private void loadExternalApk(String apkPath) {
+    private void loadExternalApk(String apkPath, Bundle savedInstanceState) {
         try {
             File dexFile = new File(apkPath, "classes.dex");
 
@@ -57,12 +57,13 @@ public class ProxyActivity extends Activity {
                 attachMethod.setAccessible(true);
                 attachMethod.invoke(externalActivity, this);
 
-                // それから外部アクティビティを開始
-                externalActivity.onCreate(null);
+                // 外部アクティビティのonCreateを呼び出す
+                externalActivity.onCreate(savedInstanceState);
 
-                // アクティビティを現在のアクティビティとして設定
-                startActivity(new Intent(this, externalActivity.getClass()));
-                finish();  // ProxyActivityは終了
+                // 外部アクティビティを開始
+                Intent intent = new Intent(this, externalActivity.getClass());
+                startActivity(intent);
+                finish();  // ProxyActivityを終了
             } else {
                 Log.e(TAG, "Loaded class is not an instance of Activity");
             }
