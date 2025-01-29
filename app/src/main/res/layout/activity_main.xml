@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Button android:id="@+id/btn_pick_apk"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="APK選択" />
+
+    <Button android:id="@+id/btn_show_folders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="解凍フォルダ表示" />
+
+    <ScrollView android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout android:id="@+id/folder_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+    </ScrollView>
+</LinearLayout>
