@@ -4,7 +4,7 @@ plugins {
 
 android {
     compileSdk = 35
-    namespace = 'com.coara.reboot'
+    namespace = 'com.coara.apkload'
 
     defaultConfig {
         minSdk = 21
