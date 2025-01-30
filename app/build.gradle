@@ -55,6 +55,7 @@ tasks.withType(JavaCompile).configureEach {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.errorprone:error_prone_core:2.7.1' // バージョンは最新のものを確認してください
     implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.webkit:webkit:1.10.0'  // WebViewの最新APIを使う
