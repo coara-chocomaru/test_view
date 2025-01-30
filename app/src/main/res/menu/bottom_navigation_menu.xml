@@ -7,9 +7,9 @@
         android:id="@+id/action_forward"
         android:title="進む" />
     <item
-        android:id="@+id/action_bookmark"
-        android:title="ブックマーク" />
+        android:id="@+id/action_screenshot"
+        android:title="スクリーンショット" />
     <item
-        android:id="@+id/action_view_bookmarks"
-        android:title="ブックマーク一覧" />
+        android:id="@+id/action_negaposi"
+        android:title="ネガポジ反転" />
 </menu>
