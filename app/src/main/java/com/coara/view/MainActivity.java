@@ -104,12 +104,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 String input = editable.toString();
+                
+                // 文字数に基づいて / を挿入
                 if (input.length() == 4 && !input.contains("/")) {
                     editable.append("/");
                 } else if (input.length() == 7 && !input.contains("/")) {
                     editable.append("/");
-                } else if (input.length() > 10) {
+                }
+                
+                // 最大文字数制限
+                if (input.length() > 10) {
                     editable.delete(10, editable.length());
+                }
+                
+                // フォーカス移動
+                if (input.length() == 7) {
+                    if (!input.contains("/")) {
+                        editable.append("/");
+                    }
                 }
             }
         });
