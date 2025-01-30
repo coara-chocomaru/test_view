@@ -102,6 +102,9 @@ public class MainActivity extends AppCompatActivity {
     private void takeScreenshot() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
+            // ネガポジ反転を反映させた後にビットマップを取得
+            webView.evaluateJavascript("document.body.style.filter = 'invert(1)';", null);
+
             // WebViewの内容をビットマップとして取得
             Bitmap bitmap = Bitmap.createBitmap(webView.getWidth(), webView.getHeight(), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
