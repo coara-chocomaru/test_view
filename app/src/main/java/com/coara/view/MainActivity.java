@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addDateInputFormatting(EditText editText) {
+        editText.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);  // 数字入力専用に設定
         editText.addTextChangedListener(new TextWatcher() {
             private boolean isFormatting;
 
