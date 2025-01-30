@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
                     formatted.setLength(MAX_DATE_LENGTH);  // 最大文字数を超えないようにする
                 }
 
+                // 入力後にカーソルが最後に来るように設定
                 editText.setText(formatted);
                 editText.setSelection(formatted.length());
                 isFormatting = false;
