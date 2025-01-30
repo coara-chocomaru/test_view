@@ -2,32 +2,28 @@ package com.coara.view;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
-import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import java.io.OutputStream;
-import java.net.URLEncoder;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -36,14 +32,9 @@ public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
     private EditText searchQuery, startDate, endDate;
+    private static final int MAX_QUERY_LENGTH = 40;
+    private static final int MAX_DATE_LENGTH = 10;  // "YYYY/MM/DD"形式のため
     private boolean isInverted = false;
-
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (!isGranted) {
-                    Toast.makeText(this, "ストレージの書き込み権限が必要です。", Toast.LENGTH_LONG).show();
-                }
-            });
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -55,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
         searchQuery = findViewById(R.id.searchQuery);
         startDate = findViewById(R.id.startDate);
         endDate = findViewById(R.id.endDate);
-        Button searchButton = findViewById(R.id.searchButton);
         Button screenshotButton = findViewById(R.id.screenshotButton);
         Button invertButton = findViewById(R.id.invertButton);
+        Button searchButton = findViewById(R.id.searchButton);
 
         // WebView設定
         webView.getSettings().setJavaScriptEnabled(true);
@@ -71,107 +62,143 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                // Google検索の検索バーを非表示にする
                 webView.evaluateJavascript(
                         "document.querySelector('[role=\"search\"]').style.display='none';", null);
             }
         });
 
-        // 検索ボタン
+        // 検索ボタンのクリックリスナー
         searchButton.setOnClickListener(v -> performSearch());
 
-        // スクリーンショットボタン
+        // スクリーンショットボタンのクリックリスナー
         screenshotButton.setOnClickListener(v -> takeScreenshot());
 
-        // ネガポジ反転ボタン
+        // ネガポジ反転ボタンのクリックリスナー
         invertButton.setOnClickListener(v -> toggleInvert());
 
-        // 入力制限
-        searchQuery.addTextChangedListener(new InputLimitWatcher(searchQuery, 40));
+        // 検索入力制限
+        searchQuery.addTextChangedListener(new InputLimitWatcher(searchQuery, MAX_QUERY_LENGTH));
         addDateInputFormatting(startDate);
         addDateInputFormatting(endDate);
 
-        // ストレージ権限の確認・リクエスト
+        // ストレージ権限を確認
         checkStoragePermission();
 
-        // ボトムナビゲーション
+        // ボトムナビゲーションの設定
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setOnItemSelectedListener(this::onNavItemSelected);
     }
 
     private void checkStoragePermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) { // Android 10未満は権限が必要
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // 権限がない場合、警告を表示
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
     }
 
     private void takeScreenshot() {
-        // WebViewをビットマップ化
-        Bitmap bitmap = Bitmap.createBitmap(webView.getWidth(), webView.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        webView.draw(canvas);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            // WebViewの内容をビットマップとして取得
+            Bitmap bitmap = Bitmap.createBitmap(webView.getWidth(), webView.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            webView.draw(canvas);
 
-        // 画像を保存
-        try {
-            String fileName = "screenshot_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".png";
-            ContentValues values = new ContentValues();
-            values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-            values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/Screenshots");
-
-            Uri imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-            if (imageUri != null) {
-                try (OutputStream out = getContentResolver().openOutputStream(imageUri)) {
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                    Toast.makeText(this, "スクリーンショットを保存しました", Toast.LENGTH_LONG).show();
-                }
+            // 保存先のディレクトリとファイル名を設定
+            File directory = new File(Environment.getExternalStorageDirectory(), "DCIM");
+            if (!directory.exists()) {
+                directory.mkdirs();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "スクリーンショットの保存に失敗しました", Toast.LENGTH_LONG).show();
+            String fileName = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".png";
+            File file = new File(directory, fileName);
+
+            // ビットマップをファイルに保存
+            try (FileOutputStream out = new FileOutputStream(file)) {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                out.flush();
+                Toast.makeText(this, "スクリーンショットが保存されました: " + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "スクリーンショットの保存に失敗しました。", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(this, "ストレージ権限が必要です。", Toast.LENGTH_LONG).show();
         }
     }
 
     private void toggleInvert() {
+        if (isInverted) {
+            // ネガポジ反転を解除
+            webView.evaluateJavascript("document.body.style.filter = 'none';", null);
+        } else {
+            // ネガポジ反転を適用
+            webView.evaluateJavascript("document.body.style.filter = 'invert(1)';", null);
+        }
         isInverted = !isInverted;
-        webView.evaluateJavascript("document.body.style.filter = '" + (isInverted ? "invert(1)" : "none") + "';", null);
     }
 
     private void performSearch() {
-        try {
-            String query = URLEncoder.encode(searchQuery.getText().toString().trim(), "UTF-8");
-            String after = startDate.getText().toString().trim();
-            String before = endDate.getText().toString().trim();
+        String query = searchQuery.getText().toString().trim();
+        String after = startDate.getText().toString().trim();
+        String before = endDate.getText().toString().trim();
 
-            StringBuilder searchUrl = new StringBuilder("https://www.google.com/search?q=");
-            searchUrl.append(query);
+        // Google検索URLを構築
+        StringBuilder searchUrl = new StringBuilder("https://www.google.com/search?q=");
+        searchUrl.append(query.replace(" ", "+"));
 
-            if (after.matches("\\d{4}/\\d{2}/\\d{2}")) searchUrl.append("+after:").append(after.replace("/", ""));
-            if (before.matches("\\d{4}/\\d{2}/\\d{2}")) searchUrl.append("+before:").append(before.replace("/", ""));
+        if (after.matches("\\d{4}/\\d{2}/\\d{2}")) searchUrl.append("+after:").append(after);
+        if (before.matches("\\d{4}/\\d{2}/\\d{2}")) searchUrl.append("+before:").append(before);
 
-            webView.loadUrl(searchUrl.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "検索エラー", Toast.LENGTH_LONG).show();
-        }
+        webView.loadUrl(searchUrl.toString());
     }
 
     private boolean onNavItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_back && webView.canGoBack()) {
-            webView.goBack();
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_back) {
+            if (webView.canGoBack()) webView.goBack();
             return true;
-        } else if (item.getItemId() == R.id.action_forward && webView.canGoForward()) {
-            webView.goForward();
+        } else if (itemId == R.id.action_forward) {
+            if (webView.canGoForward()) webView.goForward();
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     private void addDateInputFormatting(EditText editText) {
-        editText.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        editText.addTextChangedListener(new InputLimitWatcher(editText, 10));
+        editText.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_NORMAL);
+        editText.addTextChangedListener(new TextWatcher() {
+            private boolean isFormatting;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (isFormatting) return;
+                isFormatting = true;
+
+                String input = editable.toString().replaceAll("[^0-9]", "");  // 数字以外を削除
+                StringBuilder formatted = new StringBuilder();
+
+                for (int i = 0; i < input.length(); i++) {
+                    if (i == 4 || i == 6) formatted.append("/");
+                    formatted.append(input.charAt(i));
+                    if (formatted.length() == MAX_DATE_LENGTH) break;
+                }
+
+                // 入力後にカーソルが最後に来るように設定
+                editText.setText(formatted);
+                editText.setSelection(formatted.length());
+                isFormatting = false;
+            }
+        });
     }
 
     private static class InputLimitWatcher implements TextWatcher {
@@ -184,14 +211,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void afterTextChanged(Editable editable) {
-            if (editable.length() > maxLength) editable.delete(maxLength, editable.length());
-        }
-
-        @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            if (editable.length() > maxLength) {
+                editable.delete(maxLength, editable.length());
+            }
+        }
     }
 }
