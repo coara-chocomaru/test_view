@@ -55,6 +55,7 @@ tasks.withType(JavaCompile).configureEach {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'org.checkerframework:dataflow-shaded:3.11.0' // 最新のバージョンを指定
     implementation 'com.google.errorprone:error_prone_core:2.7.1' // バージョンは最新のものを確認してください
     implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
