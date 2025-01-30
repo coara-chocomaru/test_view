@@ -2,14 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_back"
-        android:title="戻る" />
+        android:title="Back" />
     <item
         android:id="@+id/action_forward"
-        android:title="進む" />
+        android:title="Forward" />
     <item
         android:id="@+id/action_bookmark"
-        android:title="ブックマーク" />
+        android:title="Bookmark" />
     <item
         android:id="@+id/action_view_bookmarks"
-        android:title="ブックマーク一覧" />
+        android:title="View Bookmarks" />
 </menu>
