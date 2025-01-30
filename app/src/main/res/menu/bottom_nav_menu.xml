@@ -1,0 +1,6 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_back" android:icon="@android:drawable/ic_media_previous" android:title="戻る"/>
+    <item android:id="@+id/action_forward" android:icon="@android:drawable/ic_media_next" android:title="進む"/>
+    <item android:id="@+id/action_bookmark" android:icon="@android:drawable/ic_menu_save" android:title="ブックマーク"/>
+    <item android:id="@+id/action_view_bookmarks" android:icon="@android:drawable/ic_menu_view" android:title="ブックマーク一覧"/>
+</menu>
