@@ -5,38 +5,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="8dp"
     tools:context=".MainActivity">
 
-    <!-- 検索バー -->
+    <!-- 検索入力エリア -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="8dp">
 
         <EditText
             android:id="@+id/searchQuery"
             android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
             android:hint="検索ワード"
+            android:maxLength="40"
             android:inputType="text" />
-
-        <EditText
-            android:id="@+id/startDate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:hint="YYYY/MM/DD"
-            android:inputType="datetime" />
-
-        <EditText
-            android:id="@+id/endDate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:hint="YYYY/MM/DD"
-            android:inputType="datetime" />
 
         <Button
             android:id="@+id/searchButton"
@@ -45,19 +30,43 @@
             android:text="検索" />
     </LinearLayout>
 
-    <!-- WebView (検索結果を表示) -->
+    <!-- 日付入力エリア -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <EditText
+            android:id="@+id/startDate"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="開始日 (YYYY/MM/DD)"
+            android:maxLength="10"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/endDate"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="終了日 (YYYY/MM/DD)"
+            android:maxLength="10"
+            android:inputType="number" />
+    </LinearLayout>
+
+    <!-- WebView -->
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!-- BottomNavigationView (アイコンなし) -->
+    <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
-        app:menu="@menu/bottom_nav_menu"
-        app:itemIconTint="@android:color/transparent" />  <!-- アイコンを透明にする -->
+        app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>
