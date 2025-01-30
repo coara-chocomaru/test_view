@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> bookmarks = new ArrayList<>();
     
     private static final int MAX_QUERY_LENGTH = 40;
-    private static final int MAX_DATE_LENGTH = 10;
+    private static final int MAX_DATE_LENGTH = 10;  // "YYYY/MM/DD"形式のため
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -116,15 +116,16 @@ public class MainActivity extends AppCompatActivity {
                 if (isFormatting) return;
                 isFormatting = true;
 
-                String input = editable.toString().replaceAll("[^0-9]", "");
+                String input = editable.toString().replaceAll("[^0-9]", "");  // 数字以外を削除
                 StringBuilder formatted = new StringBuilder();
 
+                // 文字数制限（YYYY/MM/DD）
                 if (input.length() > 4) formatted.append(input, 0, 4).append("/");
                 if (input.length() > 6) formatted.append(input, 4, 6).append("/");
                 if (input.length() > 8) formatted.append(input, 6, 8);
 
                 if (formatted.length() > MAX_DATE_LENGTH) {
-                    formatted.setLength(MAX_DATE_LENGTH);
+                    formatted.setLength(MAX_DATE_LENGTH);  // 最大文字数を超えないようにする
                 }
 
                 editText.setText(formatted);
