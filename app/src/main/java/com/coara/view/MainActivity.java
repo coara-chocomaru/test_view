@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -39,7 +40,21 @@ public class MainActivity extends AppCompatActivity {
 
         // WebView 設定
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                view.loadUrl(request.getUrl().toString());
+                return true;
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                // Google検索結果の検索バーを非表示にするCSSを適用
+                webView.evaluateJavascript(
+                        "document.querySelector('[role=\"search\"]').style.display='none';", null);
+            }
+        });
 
         // 日時入力の自動修正
         addDateInputFormatting(startDate);
@@ -61,12 +76,12 @@ public class MainActivity extends AppCompatActivity {
         String query = searchQuery.getText().toString().trim();
         String after = startDate.getText().toString().trim();
         String before = endDate.getText().toString().trim();
-        
+
         StringBuilder searchUrl = new StringBuilder("https://www.google.com/search?q=");
         searchUrl.append(query.replace(" ", "+"));
 
-        if (!after.isEmpty()) searchUrl.append("+after:").append(after);
-        if (!before.isEmpty()) searchUrl.append("+before:").append(before);
+        if (after.matches("\\d{4}/\\d{2}/\\d{2}")) searchUrl.append("+after:").append(after);
+        if (before.matches("\\d{4}/\\d{2}/\\d{2}")) searchUrl.append("+before:").append(before);
 
         // WebView に URL を読み込む
         webView.loadUrl(searchUrl.toString());
@@ -74,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
 
     // BottomNavigation のアイテム選択時の処理
     private boolean onNavItemSelected(@NonNull MenuItem item) {
-        // switch文ではなく、if-else文で処理を変更
         if (item.getItemId() == R.id.action_back) {
             if (webView.canGoBack()) webView.goBack();
             return true;
@@ -92,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // 日時入力欄の自動修正 (数字のみ)
+    // 日時入力欄の自動修正 (YYYY/MM/DD 形式)
     private void addDateInputFormatting(EditText editText) {
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -104,24 +118,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 String input = editable.toString();
-                
-                // 文字数に基づいて / を挿入
+
                 if (input.length() == 4 && !input.contains("/")) {
                     editable.append("/");
                 } else if (input.length() == 7 && !input.contains("/")) {
                     editable.append("/");
                 }
-                
+
                 // 最大文字数制限
                 if (input.length() > 10) {
                     editable.delete(10, editable.length());
                 }
-                
-                // フォーカス移動
-                if (input.length() == 7) {
-                    if (!input.contains("/")) {
-                        editable.append("/");
-                    }
+
+                // YYYY/MM/DD 形式以外の入力を制限
+                if (!input.matches("\\d{0,4}/?\\d{0,2}/?\\d{0,2}")) {
+                    editable.delete(editable.length() - 1, editable.length());
                 }
             }
         });
@@ -152,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
                 bookmarks.add(jsonArray.getString(i));
             }
         } catch (Exception e) {
-            e.printStackTrace(); // エラーが発生した場合、スタックトレースを表示
+            e.printStackTrace();
         }
     }
 
@@ -162,12 +173,11 @@ public class MainActivity extends AppCompatActivity {
         for (String bookmark : bookmarks) {
             bookmarkList.append(bookmark).append("\n");
         }
-        
-        // ブックマーク一覧のダイアログ表示
+
         new android.app.AlertDialog.Builder(this)
-            .setTitle("ブックマーク一覧")
-            .setMessage(bookmarkList.toString())
-            .setPositiveButton("閉じる", null)
-            .show();
+                .setTitle("ブックマーク一覧")
+                .setMessage(bookmarkList.toString())
+                .setPositiveButton("閉じる", null)
+                .show();
     }
 }
