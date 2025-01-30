@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 35
+        targetSdk = 26
         versionCode = 1
         versionName = "1.0"
         multiDexEnabled = true
@@ -19,11 +19,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
     }
-
-    kotlinOptions {
-        jvmTarget = "21"
-    }
-
+    
     signingConfigs {
         release {
             storeFile file('test.jks')
