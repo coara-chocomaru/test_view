@@ -83,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean onNavItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
+        int itemId = item.getItemId();
+        switch (itemId) {
             case R.id.action_back:
                 if (webView.canGoBack()) webView.goBack();
                 return true;
