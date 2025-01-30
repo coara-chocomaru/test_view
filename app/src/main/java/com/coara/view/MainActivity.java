@@ -23,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
     private EditText searchQuery, startDate, endDate;
     private SharedPreferences preferences;
     private ArrayList<String> bookmarks = new ArrayList<>();
+    
+    private static final int MAX_QUERY_LENGTH = 40;
+    private static final int MAX_DATE_LENGTH = 10;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -30,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // WebView, EditText, Button, SharedPreferences の初期化
         webView = findViewById(R.id.webView);
         searchQuery = findViewById(R.id.searchQuery);
         startDate = findViewById(R.id.startDate);
@@ -38,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
         Button searchButton = findViewById(R.id.searchButton);
         preferences = getSharedPreferences("Bookmarks", MODE_PRIVATE);
 
-        // WebView 設定
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -50,28 +51,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                // Google検索結果の検索バーを非表示にするCSSを適用
                 webView.evaluateJavascript(
                         "document.querySelector('[role=\"search\"]').style.display='none';", null);
             }
         });
 
-        // 日時入力の自動修正
+        // 入力制限の追加
+        searchQuery.addTextChangedListener(new InputLimitWatcher(searchQuery, MAX_QUERY_LENGTH));
         addDateInputFormatting(startDate);
         addDateInputFormatting(endDate);
 
-        // ブックマークを読み込む
         loadBookmarks();
-
-        // 検索ボタンのクリックリスナー設定
         searchButton.setOnClickListener(v -> performSearch());
 
-        // BottomNavigationView の設定
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setOnItemSelectedListener(this::onNavItemSelected);
     }
 
-    // 検索処理
     private void performSearch() {
         String query = searchQuery.getText().toString().trim();
         String after = startDate.getText().toString().trim();
@@ -83,62 +79,61 @@ public class MainActivity extends AppCompatActivity {
         if (after.matches("\\d{4}/\\d{2}/\\d{2}")) searchUrl.append("+after:").append(after);
         if (before.matches("\\d{4}/\\d{2}/\\d{2}")) searchUrl.append("+before:").append(before);
 
-        // WebView に URL を読み込む
         webView.loadUrl(searchUrl.toString());
     }
 
-    // BottomNavigation のアイテム選択時の処理
     private boolean onNavItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_back) {
-            if (webView.canGoBack()) webView.goBack();
-            return true;
-        } else if (item.getItemId() == R.id.action_forward) {
-            if (webView.canGoForward()) webView.goForward();
-            return true;
-        } else if (item.getItemId() == R.id.action_bookmark) {
-            addBookmark(webView.getUrl());
-            return true;
-        } else if (item.getItemId() == R.id.action_view_bookmarks) {
-            showBookmarks();
-            return true;
-        } else {
-            return false;
+        switch (item.getItemId()) {
+            case R.id.action_back:
+                if (webView.canGoBack()) webView.goBack();
+                return true;
+            case R.id.action_forward:
+                if (webView.canGoForward()) webView.goForward();
+                return true;
+            case R.id.action_bookmark:
+                addBookmark(webView.getUrl());
+                return true;
+            case R.id.action_view_bookmarks:
+                showBookmarks();
+                return true;
+            default:
+                return false;
         }
     }
 
-    // 日時入力欄の自動修正 (YYYY/MM/DD 形式)
     private void addDateInputFormatting(EditText editText) {
         editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {}
+            private boolean isFormatting;
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable editable) {
-                String input = editable.toString();
+                if (isFormatting) return;
+                isFormatting = true;
 
-                if (input.length() == 4 && !input.contains("/")) {
-                    editable.append("/");
-                } else if (input.length() == 7 && !input.contains("/")) {
-                    editable.append("/");
+                String input = editable.toString().replaceAll("[^0-9]", "");
+                StringBuilder formatted = new StringBuilder();
+
+                if (input.length() > 4) formatted.append(input, 0, 4).append("/");
+                if (input.length() > 6) formatted.append(input, 4, 6).append("/");
+                if (input.length() > 8) formatted.append(input, 6, 8);
+
+                if (formatted.length() > MAX_DATE_LENGTH) {
+                    formatted.setLength(MAX_DATE_LENGTH);
                 }
 
-                // 最大文字数制限
-                if (input.length() > 10) {
-                    editable.delete(10, editable.length());
-                }
-
-                // YYYY/MM/DD 形式以外の入力を制限
-                if (!input.matches("\\d{0,4}/?\\d{0,2}/?\\d{0,2}")) {
-                    editable.delete(editable.length() - 1, editable.length());
-                }
+                editText.setText(formatted);
+                editText.setSelection(formatted.length());
+                isFormatting = false;
             }
         });
     }
 
-    // ブックマーク追加処理
     private void addBookmark(String url) {
         if (url != null && !bookmarks.contains(url)) {
             bookmarks.add(url);
@@ -146,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ブックマークの保存
     private void saveBookmarks() {
         SharedPreferences.Editor editor = preferences.edit();
         JSONArray jsonArray = new JSONArray(bookmarks);
@@ -154,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    // ブックマークの読み込み
     private void loadBookmarks() {
         String json = preferences.getString("bookmark_list", "[]");
         try {
@@ -167,7 +160,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ブックマークの表示
     private void showBookmarks() {
         StringBuilder bookmarkList = new StringBuilder();
         for (String bookmark : bookmarks) {
@@ -179,5 +171,28 @@ public class MainActivity extends AppCompatActivity {
                 .setMessage(bookmarkList.toString())
                 .setPositiveButton("閉じる", null)
                 .show();
+    }
+
+    private static class InputLimitWatcher implements TextWatcher {
+        private final EditText editText;
+        private final int maxLength;
+
+        InputLimitWatcher(EditText editText, int maxLength) {
+            this.editText = editText;
+            this.maxLength = maxLength;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            if (editable.length() > maxLength) {
+                editable.delete(maxLength, editable.length());
+            }
+        }
     }
 }
