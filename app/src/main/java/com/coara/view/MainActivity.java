@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -13,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.json.JSONArray;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // WebView, EditText, Button, SharedPreferences の初期化
         webView = findViewById(R.id.webView);
         searchQuery = findViewById(R.id.searchQuery);
         startDate = findViewById(R.id.startDate);
@@ -35,17 +36,22 @@ public class MainActivity extends AppCompatActivity {
         Button searchButton = findViewById(R.id.searchButton);
         preferences = getSharedPreferences("Bookmarks", MODE_PRIVATE);
 
+        // WebView 設定
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient());
-        
+
+        // ブックマークを読み込む
         loadBookmarks();
 
+        // 検索ボタンのクリックリスナー設定
         searchButton.setOnClickListener(v -> performSearch());
 
+        // BottomNavigationView の設定
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
-        bottomNav.setOnNavigationItemSelectedListener(this::onNavItemSelected);
+        bottomNav.setOnItemSelectedListener(this::onNavItemSelected);
     }
 
+    // 検索処理
     private void performSearch() {
         String query = searchQuery.getText().toString().trim();
         String after = startDate.getText().toString().trim();
@@ -57,9 +63,11 @@ public class MainActivity extends AppCompatActivity {
         if (!after.isEmpty()) searchUrl.append("+after:").append(after);
         if (!before.isEmpty()) searchUrl.append("+before:").append(before);
 
+        // WebView に URL を読み込む
         webView.loadUrl(searchUrl.toString());
     }
 
+    // BottomNavigation のアイテム選択時の処理
     private boolean onNavItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_back:
@@ -79,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // ブックマーク追加処理
     private void addBookmark(String url) {
         if (url != null && !bookmarks.contains(url)) {
             bookmarks.add(url);
@@ -86,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // ブックマークの保存
     private void saveBookmarks() {
         SharedPreferences.Editor editor = preferences.edit();
         JSONArray jsonArray = new JSONArray(bookmarks);
@@ -93,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
+    // ブックマークの読み込み
     private void loadBookmarks() {
         String json = preferences.getString("bookmark_list", "[]");
         try {
@@ -101,15 +112,18 @@ public class MainActivity extends AppCompatActivity {
                 bookmarks.add(jsonArray.getString(i));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // エラーが発生した場合、スタックトレースを表示
         }
     }
 
+    // ブックマークの表示
     private void showBookmarks() {
         StringBuilder bookmarkList = new StringBuilder();
         for (String bookmark : bookmarks) {
             bookmarkList.append(bookmark).append("\n");
         }
+        
+        // ブックマーク一覧のダイアログ表示
         new android.app.AlertDialog.Builder(this)
             .setTitle("ブックマーク一覧")
             .setMessage(bookmarkList.toString())
