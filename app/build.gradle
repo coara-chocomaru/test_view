@@ -4,11 +4,11 @@ plugins {
 
 android {
     compileSdk = 35
-    namespace = 'com.coara.apkload'
+    namespace = 'com.coara.view'
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 24
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
         multiDexEnabled = true
@@ -31,7 +31,7 @@ android {
 
     buildTypes {
         configureEach {
-            String variant = new File("release.jks").exists() ? "release" : "debug"
+            String variant = new File("test.jks").exists() ? "release" : "debug"
             signingConfig = signingConfigs[variant]
         }
         release {
@@ -55,8 +55,14 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
 }
 
+buildFeatures {
+        viewBinding true  // View Binding を有効化（便利なので推奨）
+    }
+}
+
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.core:core:1.12.0'
-    implementation 'com.google.android.material:material:1.10.0'  // ← 追加
+    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.webkit:webkit:1.10.0'  // WebViewの最新APIを使う
 }
