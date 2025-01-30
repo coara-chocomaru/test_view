@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.json.JSONArray;
-
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -69,21 +68,21 @@ public class MainActivity extends AppCompatActivity {
 
     // BottomNavigation のアイテム選択時の処理
     private boolean onNavItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_back:
-                if (webView.canGoBack()) webView.goBack();
-                return true;
-            case R.id.action_forward:
-                if (webView.canGoForward()) webView.goForward();
-                return true;
-            case R.id.action_bookmark:
-                addBookmark(webView.getUrl());
-                return true;
-            case R.id.action_view_bookmarks:
-                showBookmarks();
-                return true;
-            default:
-                return false;
+        // switch文ではなく、if-else文で処理を変更
+        if (item.getItemId() == R.id.action_back) {
+            if (webView.canGoBack()) webView.goBack();
+            return true;
+        } else if (item.getItemId() == R.id.action_forward) {
+            if (webView.canGoForward()) webView.goForward();
+            return true;
+        } else if (item.getItemId() == R.id.action_bookmark) {
+            addBookmark(webView.getUrl());
+            return true;
+        } else if (item.getItemId() == R.id.action_view_bookmarks) {
+            showBookmarks();
+            return true;
+        } else {
+            return false;
         }
     }
 
