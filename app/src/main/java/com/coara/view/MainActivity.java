@@ -3,6 +3,8 @@ package com.coara.view;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -38,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
         // WebView 設定
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient());
+
+        // 日時入力の自動修正
+        addDateInputFormatting(startDate);
+        addDateInputFormatting(endDate);
 
         // ブックマークを読み込む
         loadBookmarks();
@@ -84,6 +90,29 @@ public class MainActivity extends AppCompatActivity {
         } else {
             return false;
         }
+    }
+
+    // 日時入力欄の自動修正 (数字のみ)
+    private void addDateInputFormatting(EditText editText) {
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String input = editable.toString();
+                if (input.length() == 4 && !input.contains("/")) {
+                    editable.append("/");
+                } else if (input.length() == 7 && !input.contains("/")) {
+                    editable.append("/");
+                } else if (input.length() > 10) {
+                    editable.delete(10, editable.length());
+                }
+            }
+        });
     }
 
     // ブックマーク追加処理
