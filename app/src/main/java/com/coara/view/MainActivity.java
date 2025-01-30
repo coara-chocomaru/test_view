@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addDateInputFormatting(EditText editText) {
-        editText.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);  // 数字入力専用に設定
+        editText.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_NORMAL);
         editText.addTextChangedListener(new TextWatcher() {
             private boolean isFormatting;
 
@@ -117,13 +117,13 @@ public class MainActivity extends AppCompatActivity {
                 if (isFormatting) return;
                 isFormatting = true;
 
-                String input = editable.toString().replaceAll("[^0-9]", "");  // 数字以外を削除
+                String input = editable.toString();
                 StringBuilder formatted = new StringBuilder();
 
                 // 文字数制限（YYYY/MM/DD）
-                if (input.length() > 4) formatted.append(input, 0, 4).append("/");
-                if (input.length() > 6) formatted.append(input, 4, 6).append("/");
-                if (input.length() > 8) formatted.append(input, 6, 8);
+                if (input.length() > 4) formatted.append(input.substring(0, 4)).append("/");
+                if (input.length() > 7) formatted.append(input.substring(4, 7)).append("/");
+                if (input.length() > 10) formatted.append(input.substring(7, 10));
 
                 if (formatted.length() > MAX_DATE_LENGTH) {
                     formatted.setLength(MAX_DATE_LENGTH);  // 最大文字数を超えないようにする
