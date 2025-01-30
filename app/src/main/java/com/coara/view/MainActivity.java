@@ -84,21 +84,20 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean onNavItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
-        switch (itemId) {
-            case R.id.action_back:
-                if (webView.canGoBack()) webView.goBack();
-                return true;
-            case R.id.action_forward:
-                if (webView.canGoForward()) webView.goForward();
-                return true;
-            case R.id.action_bookmark:
-                addBookmark(webView.getUrl());
-                return true;
-            case R.id.action_view_bookmarks:
-                showBookmarks();
-                return true;
-            default:
-                return false;
+        if (itemId == R.id.action_back) {
+            if (webView.canGoBack()) webView.goBack();
+            return true;
+        } else if (itemId == R.id.action_forward) {
+            if (webView.canGoForward()) webView.goForward();
+            return true;
+        } else if (itemId == R.id.action_bookmark) {
+            addBookmark(webView.getUrl());
+            return true;
+        } else if (itemId == R.id.action_view_bookmarks) {
+            showBookmarks();
+            return true;
+        } else {
+            return false;
         }
     }
 
