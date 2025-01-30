@@ -117,16 +117,13 @@ public class MainActivity extends AppCompatActivity {
                 if (isFormatting) return;
                 isFormatting = true;
 
-                String input = editable.toString();
+                String input = editable.toString().replaceAll("[^0-9]", "");  // 数字以外を削除
                 StringBuilder formatted = new StringBuilder();
 
-                // 文字数制限（YYYY/MM/DD）
-                if (input.length() > 4) formatted.append(input.substring(0, 4)).append("/");
-                if (input.length() > 7) formatted.append(input.substring(4, 7)).append("/");
-                if (input.length() > 10) formatted.append(input.substring(7, 10));
-
-                if (formatted.length() > MAX_DATE_LENGTH) {
-                    formatted.setLength(MAX_DATE_LENGTH);  // 最大文字数を超えないようにする
+                for (int i = 0; i < input.length(); i++) {
+                    if (i == 4 || i == 6) formatted.append("/");
+                    formatted.append(input.charAt(i));
+                    if (formatted.length() == MAX_DATE_LENGTH) break;
                 }
 
                 // 入力後にカーソルが最後に来るように設定
