@@ -70,8 +70,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 初期ページはGoogle検索ページ
-        webView.loadUrl("https://www.google.com");
+        // 初期ページは空白ページ
+        webView.loadUrl("about:blank");
 
         // 検索ボタンのクリックリスナー
         searchButton.setOnClickListener(v -> performSearch());
@@ -108,9 +108,16 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
 
-            // WebViewの内容をビットマップとして取得
-            Bitmap bitmap = Bitmap.createBitmap(webView.getWidth(), webView.getHeight(), Bitmap.Config.ARGB_8888);
+            // WebViewの内容の全体サイズを計算
+            int width = webView.getWidth();
+            int height = webView.getContentHeight();
+
+            // ビットマップを作成（WebViewの全体サイズに合わせる）
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
+
+            // WebViewの内容を描画
+            webView.layout(0, 0, width, height);
             webView.draw(canvas);
 
             // 保存先のディレクトリとファイル名を設定
