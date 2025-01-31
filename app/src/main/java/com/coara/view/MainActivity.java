@@ -232,7 +232,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void afterTextChanged(Editable editable) {
             if (editable.length() > maxLength) {
-                editable.delete(maxLength, editable.length());
+                editText.setText(editable.subSequence(0, maxLength));
+                editText.setSelection(maxLength);
             }
         }
     }
