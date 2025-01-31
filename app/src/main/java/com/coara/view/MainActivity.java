@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
@@ -108,17 +107,16 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
 
-            // WebViewの表示領域のサイズを取得
+            // WebViewの内容の全体サイズを計算
             int width = webView.getWidth();
-            int height = webView.getHeight();
+            int height = webView.getContentHeight();
 
-            // WebViewの表示領域に対応するビットマップを作成
+            // WebViewのスクリーンショットをキャプチャする
             Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-
-            // WebViewの現在の表示領域を描画
             webView.layout(0, 0, width, height);
-            webView.draw(canvas);
+            webView.draw(new Canvas(bitmap));
+
+            // UI要素（ボタンなど）を含まないスクリーンショットを取得するために、WebViewのコンテンツのみをキャプチャ
 
             // 保存先のディレクトリとファイル名を設定
             File directory = new File(Environment.getExternalStorageDirectory(), "DCIM");
