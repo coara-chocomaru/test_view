@@ -5,35 +5,38 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
+    <!-- Search Query -->
     <EditText
         android:id="@+id/searchQuery"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:hint="検索ワード"
+        android:layout_height="40dp"
+        android:hint="検索クエリ"
         android:inputType="text"
         android:maxLines="1"
-        android:textSize="12sp" />
+        android:textSize="14sp"
+        android:padding="5dp" />
 
     <!-- Start Date -->
     <EditText
         android:id="@+id/startDate"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="40dp"
         android:hint="開始日 (YYYY/MM/DD)"
         android:inputType="number"
         android:maxLines="1"
-        android:textSize="12sp" />
+        android:textSize="14sp"
+        android:padding="5dp" />
 
     <!-- End Date -->
     <EditText
         android:id="@+id/endDate"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="40dp"
         android:hint="終了日 (YYYY/MM/DD)"
         android:inputType="number"
         android:maxLines="1"
-        android:textSize="12sp" />
+        android:textSize="14sp"
+        android:padding="5dp" />
 
     <!-- Buttons for screenshot and invert -->
     <LinearLayout
@@ -44,18 +47,18 @@
         <Button
             android:id="@+id/screenshotButton"
             android:layout_width="0dp"
-            android:layout_height="32dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
             android:text="スクショ"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/invertButton"
             android:layout_width="0dp"
-            android:layout_height="32dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
             android:text="反転"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -63,9 +66,9 @@
     <Button
         android:id="@+id/searchButton"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="40dp"
         android:text="検索"
-        android:textSize="12sp" />
+        android:textSize="14sp" />
 
     <!-- WebView for displaying search results -->
     <WebView
@@ -79,6 +82,6 @@
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/bottom_navigation_menu" />
 
 </LinearLayout>
