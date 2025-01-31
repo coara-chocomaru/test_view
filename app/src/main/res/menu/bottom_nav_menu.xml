@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
         android:id="@+id/action_back"
-        android:icon="@android:drawable/ic_media_previous"
-        android:title="Back"
-        android:showAsAction="ifRoom" />
-
+        android:icon="@drawable/ic_back"
+        android:title="戻る" />
     <item
         android:id="@+id/action_forward"
-        android:icon="@android:drawable/ic_media_next"
-        android:title="Forward"
-        android:showAsAction="ifRoom" />
-
+        android:icon="@drawable/ic_forward"
+        android:title="進む" />
 </menu>
