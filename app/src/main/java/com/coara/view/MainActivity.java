@@ -8,6 +8,8 @@ import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.MenuItem;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
