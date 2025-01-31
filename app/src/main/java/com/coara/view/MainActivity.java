@@ -108,15 +108,15 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
 
-            // WebViewの内容の全体サイズを計算
+            // WebViewの表示領域のサイズを取得
             int width = webView.getWidth();
-            int height = webView.getContentHeight();
+            int height = webView.getHeight();
 
-            // ビットマップを作成（WebViewの全体サイズに合わせる）
+            // WebViewの表示領域に対応するビットマップを作成
             Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
 
-            // WebViewの内容を描画
+            // WebViewの現在の表示領域を描画
             webView.layout(0, 0, width, height);
             webView.draw(canvas);
 
