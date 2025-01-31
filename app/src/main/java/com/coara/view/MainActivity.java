@@ -97,6 +97,12 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(this::onNavItemSelected);
     }
 
+    @Override
+    public void onBackPressed() {
+        // バックキーを無効化
+        // 何も処理しないことでバックキーを無効化
+    }
+
     private void checkStoragePermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
