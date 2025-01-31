@@ -10,7 +10,7 @@
         android:id="@+id/searchQuery"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:hint="検索クエリ"
+        android:hint="検索ワード"
         android:inputType="text"
         android:maxLines="1"
         android:textSize="14sp"
