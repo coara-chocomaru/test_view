@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         // WebView設定
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY); // 無限スクロール防止
+        webView.setBackgroundColor(0xFFFFFF); // 背景色を白に設定
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -68,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
                         "document.querySelector('[role=\"search\"]').style.display='none';", null);
             }
         });
+
+        // 初期ページはGoogle検索ページ
+        webView.loadUrl("https://www.google.com");
 
         // 検索ボタンのクリックリスナー
         searchButton.setOnClickListener(v -> performSearch());
@@ -103,13 +107,6 @@ public class MainActivity extends AppCompatActivity {
     private void takeScreenshot() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
-
-            // ビットマップ作成前にネガポジ反転を適用
-            if (isInverted) {
-                webView.evaluateJavascript("document.body.style.filter = 'invert(1)';", null);
-            } else {
-                webView.evaluateJavascript("document.body.style.filter = 'none';", null);
-            }
 
             // WebViewの内容をビットマップとして取得
             Bitmap bitmap = Bitmap.createBitmap(webView.getWidth(), webView.getHeight(), Bitmap.Config.ARGB_8888);
