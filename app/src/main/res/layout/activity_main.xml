@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <!-- Search Query -->
+    
     <EditText
         android:id="@+id/searchQuery"
         android:layout_width="match_parent"
@@ -16,7 +15,7 @@
         android:textSize="14sp"
         android:padding="5dp" />
 
-    <!-- Start Date -->
+    
     <EditText
         android:id="@+id/startDate"
         android:layout_width="match_parent"
@@ -27,7 +26,7 @@
         android:textSize="14sp"
         android:padding="5dp" />
 
-    <!-- End Date -->
+
     <EditText
         android:id="@+id/endDate"
         android:layout_width="match_parent"
@@ -38,7 +37,7 @@
         android:textSize="14sp"
         android:padding="5dp" />
 
-    <!-- Buttons for screenshot and invert -->
+    
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -62,7 +61,7 @@
 
     </LinearLayout>
 
-    <!-- Search Button -->
+
     <Button
         android:id="@+id/searchButton"
         android:layout_width="match_parent"
@@ -70,14 +69,14 @@
         android:text="検索"
         android:textSize="14sp" />
 
-    <!-- WebView for displaying search results -->
+    
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!-- Bottom Navigation -->
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
