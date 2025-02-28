@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private EditText searchQuery, startDate, endDate;
     private static final int MAX_QUERY_LENGTH = 40;
-    private static final int MAX_DATE_LENGTH = 10;  // "YYYY/MM/DD"形式のため
+    private static final int MAX_DATE_LENGTH = 10; 
     private boolean isInverted = false;
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -52,10 +52,10 @@ public class MainActivity extends AppCompatActivity {
         Button invertButton = findViewById(R.id.invertButton);
         Button searchButton = findViewById(R.id.searchButton);
 
-        // WebView設定
+        
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY); // 無限スクロール防止
-        webView.setBackgroundColor(0xFFFFFF); // 背景色を白に設定
+        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+        webView.setBackgroundColor(0xFFFFFF); 
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -66,47 +66,46 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                // Google検索の検索バーを非表示にする
+
                 webView.evaluateJavascript(
                         "document.querySelector('[role=\"search\"]').style.display='none';", null);
             }
         });
 
-        // 初期ページは空白ページ
+        
         webView.loadUrl("about:blank");
 
-        // 検索ボタンのクリックリスナー
+        
         searchButton.setOnClickListener(v -> performSearch());
 
-        // スクリーンショットボタンのクリックリスナー
+        
         screenshotButton.setOnClickListener(v -> takeScreenshot());
 
-        // ネガポジ反転ボタンのクリックリスナー
+    
         invertButton.setOnClickListener(v -> toggleInvert());
 
-        // 検索入力制限
+
         searchQuery.addTextChangedListener(new InputLimitWatcher(searchQuery, MAX_QUERY_LENGTH));
         addDateInputFormatting(startDate);
         addDateInputFormatting(endDate);
 
-        // ストレージ権限を確認
+        
         checkStoragePermission();
 
-        // ボトムナビゲーションの設定
+        
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setOnItemSelectedListener(this::onNavItemSelected);
     }
 
     @Override
     public void onBackPressed() {
-        // バックキーを無効化
-        // 何も処理しないことでバックキーを無効化
+
     }
 
     private void checkStoragePermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-            // 権限がない場合、警告を表示
+        
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
@@ -116,13 +115,13 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
 
-            // 全体のレイアウトをスクリーンショットに含める
+            
             View rootView = getWindow().getDecorView().getRootView();
             rootView.setDrawingCacheEnabled(true);
             Bitmap bitmap = Bitmap.createBitmap(rootView.getDrawingCache());
             rootView.setDrawingCacheEnabled(false);
 
-            // 保存先のディレクトリとファイル名を設定
+        
             File directory = new File(Environment.getExternalStorageDirectory(), "DCIM");
             if (!directory.exists()) {
                 directory.mkdirs();
@@ -130,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
             String fileName = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".png";
             File file = new File(directory, fileName);
 
-            // ビットマップをファイルに保存
+        
             try (FileOutputStream out = new FileOutputStream(file)) {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
                 out.flush();
@@ -146,10 +145,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void toggleInvert() {
         if (isInverted) {
-            // ネガポジ反転を解除
+
             webView.evaluateJavascript("document.body.style.filter = 'none';", null);
         } else {
-            // ネガポジ反転を適用
+        
             webView.evaluateJavascript("document.body.style.filter = 'invert(1)';", null);
         }
         isInverted = !isInverted;
@@ -160,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         String after = startDate.getText().toString().trim();
         String before = endDate.getText().toString().trim();
 
-        // Google検索URLを構築
+        
         StringBuilder searchUrl = new StringBuilder("https://www.google.com/search?q=");
         searchUrl.append(query.replace(" ", "+"));
 
@@ -199,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
                 if (isFormatting) return;
                 isFormatting = true;
 
-                String input = editable.toString().replaceAll("[^0-9]", "");  // 数字以外を削除
+                String input = editable.toString().replaceAll("[^0-9]", "");  
                 StringBuilder formatted = new StringBuilder();
 
                 for (int i = 0; i < input.length(); i++) {
@@ -208,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
                     if (formatted.length() == MAX_DATE_LENGTH) break;
                 }
 
-                // 入力後にカーソルが最後に来るように設定
+            
                 editText.setText(formatted);
                 editText.setSelection(formatted.length());
                 isFormatting = false;
